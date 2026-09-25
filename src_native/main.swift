@@ -88,6 +88,11 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, WKNavigati
     // MARK: - Project Directory & Process Management
 
     func findProjectDirectory(bundlePath: String) -> String {
+        // 1. Check if Resources inside the .app bundle contains gui.py (Self-contained app)
+        let resourcesDir = (bundlePath as NSString).appendingPathComponent("Contents/Resources")
+        if FileManager.default.fileExists(atPath: (resourcesDir as NSString).appendingPathComponent("gui.py")) {
+            return resourcesDir
+        }
         if let envDir = ProcessInfo.processInfo.environment["EROWID_PROJECT_DIR"],
            FileManager.default.fileExists(atPath: envDir) {
             return envDir

@@ -21,3 +21,5 @@ data/cache/
 *.log
 data/*.log
 
+
+dist/
