@@ -92,16 +92,20 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, WKNavigati
            FileManager.default.fileExists(atPath: envDir) {
             return envDir
         }
-        let standardPath = "/Users/marksadler/erowid_safedb"
+        let parentDir = (bundlePath as NSString).deletingLastPathComponent
+        let guiPath = (parentDir as NSString).appendingPathComponent("gui.py")
+        if FileManager.default.fileExists(atPath: guiPath) {
+            return parentDir
+        }
+        let adjacentDir = (parentDir as NSString).appendingPathComponent("erowid_safedb")
+        if FileManager.default.fileExists(atPath: (adjacentDir as NSString).appendingPathComponent("gui.py")) {
+            return adjacentDir
+        }
+        let standardPath = "/Users/markrsadler/Downloads/erowid_safedb"
         if FileManager.default.fileExists(atPath: standardPath) {
             return standardPath
         }
-        let parentDir = (bundlePath as NSString).deletingLastPathComponent
-        let adjacentDir = (parentDir as NSString).appendingPathComponent("erowid_safedb")
-        if FileManager.default.fileExists(atPath: adjacentDir) {
-            return adjacentDir
-        }
-        return standardPath
+        return parentDir
     }
 
     func findFreePort(startingAt startPort: Int) -> Int {
@@ -139,7 +143,8 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, WKNavigati
 
         var env = ProcessInfo.processInfo.environment
         env["PATH"] = "/Library/Developer/CommandLineTools/usr/bin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin:" + (env["PATH"] ?? "")
-        env["PYTHONPATH"] = "/Users/marksadler/Library/Python/3.9/lib/python/site-packages:\(projectDir):" + (env["PYTHONPATH"] ?? "")
+        let homeDir = NSHomeDirectory()
+        env["PYTHONPATH"] = "\(homeDir)/Library/Python/3.9/lib/python/site-packages:\(projectDir):" + (env["PYTHONPATH"] ?? "")
         proc.environment = env
 
         // Redirect stdout/stderr to a log file instead of an undrained pipe

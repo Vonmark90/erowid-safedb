@@ -142,7 +142,9 @@ def main():
     # Default: Launch native macOS Cocoa desktop app if compiled binary is available
     base_dir = os.path.dirname(os.path.abspath(__file__))
     native_bin = os.path.join(base_dir, "bin", "ErowidSafeDB")
-    app_bundle_bin = "/Users/marksadler/Desktop/Erowid SafeDB.app/Contents/MacOS/ErowidSafeDB"
+    app_bundle_bin = os.path.join(base_dir, "Erowid SafeDB.app", "Contents", "MacOS", "ErowidSafeDB")
+    if not (os.path.exists(app_bundle_bin) and os.access(app_bundle_bin, os.X_OK)):
+        app_bundle_bin = os.path.expanduser("~/Desktop/Erowid SafeDB.app/Contents/MacOS/ErowidSafeDB")
 
     if os.path.exists(native_bin) and os.access(native_bin, os.X_OK):
         print("🖥️ Launching Native macOS Cocoa Desktop Application...")
