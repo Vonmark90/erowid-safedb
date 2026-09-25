@@ -6,6 +6,18 @@ The project enables open access to clinical monographs, lethal drug combination 
 
 ---
 
+## 🚀 Download Standalone Apps (No Python Required)
+
+Pre-built, self-contained standalone desktop applications are available directly from the **[GitHub Releases Page](https://github.com/Vonmark90/erowid-safedb/releases/tag/v2.5.0)**:
+
+| Platform | Download | Launch Instructions |
+| :--- | :--- | :--- |
+| 🍏 **macOS** | [**`ErowidSafeDB-macOS.zip`**](https://github.com/Vonmark90/erowid-safedb/releases/download/v2.5.0/ErowidSafeDB-macOS.zip) | Unzip and launch **`Erowid SafeDB.app`** |
+| 🪟 **Windows** | [**`ErowidSafeDB-Windows-x64.zip`**](https://github.com/Vonmark90/erowid-safedb/releases/download/v2.5.0/ErowidSafeDB-Windows-x64.zip) | Unzip and double-click **`ErowidSafeDB.exe`** |
+| 🐧 **Linux** | [**`ErowidSafeDB-Linux-x64.tar.gz`**](https://github.com/Vonmark90/erowid-safedb/releases/download/v2.5.0/ErowidSafeDB-Linux-x64.tar.gz) | `tar -xvf ErowidSafeDB-Linux-x64.tar.gz && ./ErowidSafeDB` |
+
+---
+
 ## ⚡ Key Capabilities
 
 1. **Master Erowid Archive Catalog (560+ Substances)**
