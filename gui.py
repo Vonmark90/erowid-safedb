@@ -17,6 +17,12 @@ import webbrowser
 import threading
 import http.server
 
+# Safety fallback for windowed PyInstaller binaries where stdout/stderr may be None
+if sys.stdout is None:
+    sys.stdout = open(os.devnull, "w")
+if sys.stderr is None:
+    sys.stderr = open(os.devnull, "w")
+
 # Add package root to sys.path
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 

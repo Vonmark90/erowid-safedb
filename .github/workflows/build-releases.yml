@@ -1,10 +1,15 @@
 name: Build and Release Standalone Apps
 
-on:
+'on':
   push:
     tags:
       - 'v*'
-  workflow_dispatch: {}
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: 'Release Tag (e.g. v2.5.0)'
+        required: false
+        default: 'v2.5.0'
 
 permissions:
   contents: write
@@ -29,14 +34,8 @@ jobs:
 
       - name: Build Windows Executable
         run: |
-          pyinstaller --noconfirm --onefile --windowed `
-            --name "ErowidSafeDB" `
-            --add-data "data;data" `
-            --add-data "assets;assets" `
-            gui.py
-          mkdir release-win
-          Copy-Item dist\ErowidSafeDB.exe release-win\
-          Compress-Archive -Path release-win\* -DestinationPath ErowidSafeDB-Windows-x64.zip
+          pyinstaller --noconfirm --onefile --windowed --name "ErowidSafeDB" --add-data "data;data" --add-data "assets;assets" gui.py
+          Compress-Archive -Path dist\ErowidSafeDB.exe -DestinationPath ErowidSafeDB-Windows-x64.zip
 
       - name: Upload Windows Artifact
         uses: actions/upload-artifact@v4
@@ -63,14 +62,8 @@ jobs:
 
       - name: Build Linux Binary
         run: |
-          pyinstaller --noconfirm --onefile \
-            --name "ErowidSafeDB" \
-            --add-data "data:data" \
-            --add-data "assets:assets" \
-            gui.py
-          mkdir release-linux
-          cp dist/ErowidSafeDB release-linux/
-          tar -czvf ErowidSafeDB-Linux-x64.tar.gz -C release-linux ErowidSafeDB
+          pyinstaller --noconfirm --onefile --name "ErowidSafeDB" --add-data "data:data" --add-data "assets:assets" gui.py
+          tar -czvf ErowidSafeDB-Linux-x64.tar.gz -C dist ErowidSafeDB
 
       - name: Upload Linux Artifact
         uses: actions/upload-artifact@v4
@@ -130,20 +123,33 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          TAG_NAME="${GITHUB_REF_NAME}"
-          if [[ "$GITHUB_REF_TYPE" != "tag" || -z "$TAG_NAME" ]]; then
+          TAG_NAME="${{ inputs.tag }}"
+          if [ -z "$TAG_NAME" ]; then
+            TAG_NAME="${GITHUB_REF_NAME}"
+          fi
+          if [ "$GITHUB_REF_TYPE" != "tag" ] || [ -z "$TAG_NAME" ]; then
             TAG_NAME="v2.5.0"
           fi
-          gh release create "$TAG_NAME" \
-            ErowidSafeDB-Windows-x64.zip \
-            ErowidSafeDB-Linux-x64.tar.gz \
-            ErowidSafeDB-macOS.zip \
-            --title "Erowid SafeDB Pro $TAG_NAME — Standalone Applications" \
-            --notes "### 🚀 Erowid SafeDB Standalone Releases
 
-Pre-compiled, self-contained standalone applications for macOS, Windows, and Linux. No Python installation required!
+          echo "Target Release Tag: $TAG_NAME"
 
-- 🍏 **macOS**: Download \`ErowidSafeDB-macOS.zip\`, unzip, and double-click **Erowid SafeDB.app**.
-- 🪟 **Windows**: Download \`ErowidSafeDB-Windows-x64.zip\`, unzip, and double-click **ErowidSafeDB.exe**.
-- 🐧 **Linux**: Download \`ErowidSafeDB-Linux-x64.tar.gz\`, extract, and execute \`./ErowidSafeDB\`." \
-            --clobber
+          cat << 'EOF' > release_notes.md
+          ### 🚀 Erowid SafeDB Standalone Releases
+
+          Pre-compiled, self-contained standalone applications for macOS, Windows, and Linux. No Python installation required!
+
+          - 🍏 **macOS**: Download `ErowidSafeDB-macOS.zip`, unzip, and launch **Erowid SafeDB.app**.
+          - 🪟 **Windows**: Download `ErowidSafeDB-Windows-x64.zip`, extract, and launch **ErowidSafeDB.exe**.
+          - 🐧 **Linux**: Download `ErowidSafeDB-Linux-x64.tar.gz`, extract (`tar -xvf ErowidSafeDB-Linux-x64.tar.gz`), and run `./ErowidSafeDB`.
+          EOF
+
+          # Check if release exists; if so, upload assets to it. Otherwise create it.
+          if gh release view "$TAG_NAME" >/dev/null 2>&1; then
+            echo "Release $TAG_NAME exists. Uploading/overwriting standalone assets..."
+            gh release upload "$TAG_NAME" ErowidSafeDB-Windows-x64.zip ErowidSafeDB-Linux-x64.tar.gz ErowidSafeDB-macOS.zip --clobber
+          else
+            echo "Creating new release $TAG_NAME..."
+            gh release create "$TAG_NAME" ErowidSafeDB-Windows-x64.zip ErowidSafeDB-Linux-x64.tar.gz ErowidSafeDB-macOS.zip \
+              --title "Erowid SafeDB Pro $TAG_NAME — Standalone Applications" \
+              --notes-file release_notes.md
+          fi
