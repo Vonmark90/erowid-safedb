@@ -3,10 +3,14 @@
 <plist version="1.0">
 <dict>
     <key>CFBundleExecutable</key>
-    <string>erowid_launcher</string>
+    <string>ErowidSafeDB</string>
+    <key>CFBundleIconFile</key>
+    <string>AppIcon</string>
     <key>CFBundleIdentifier</key>
-    <string>org.erowidsafedb.app</string>
+    <string>org.erowidsafedb.desktop</string>
     <key>CFBundleName</key>
+    <string>Erowid SafeDB</string>
+    <key>CFBundleDisplayName</key>
     <string>Erowid SafeDB</string>
     <key>CFBundlePackageType</key>
     <string>APPL</string>

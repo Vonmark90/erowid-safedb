@@ -1,0 +1,23 @@
+#!/bin/bash
+# Erowid SafeDB macOS Desktop Launcher
+PROJECT_DIR="/Users/marksadler/erowid_safedb"
+LOG_FILE="$PROJECT_DIR/data/desktop_app.log"
+
+export PATH="/Library/Developer/CommandLineTools/usr/bin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin:$PATH"
+export PYTHONPATH="/Users/marksadler/Library/Python/3.9/lib/python/site-packages:$PROJECT_DIR:$PYTHONPATH"
+
+cd "$PROJECT_DIR" || exit 1
+
+PORT=8080
+# If already running on port 8080, open browser directly
+if lsof -Pi :$PORT -sTCP:LISTEN -t >/dev/null 2>&1 ; then
+    osascript -e 'display notification "Opening running Erowid SafeDB session..." with title "Erowid SafeDB"'
+    open "http://localhost:$PORT"
+    exit 0
+fi
+
+# Notify user of startup
+osascript -e 'display notification "Launching Erowid SafeDB Desktop App..." with title "Erowid SafeDB"'
+
+# Run python3 gui.py and redirect output to log
+exec /usr/bin/python3 gui.py --port $PORT >> "$LOG_FILE" 2>&1
