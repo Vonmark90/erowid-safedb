@@ -14,6 +14,8 @@ from erowid_safedb.models import (
     ExperienceReport,
     ExperienceDoseItem,
     AdverseEvent,
+    CatalogEntry,
+    ReportIndexItem,
 )
 
 
@@ -165,12 +167,42 @@ class Database:
             );
             """)
 
+            # Erowid Master Catalog table
+            cur.execute("""
+            CREATE TABLE IF NOT EXISTS erowid_catalog (
+                slug TEXT PRIMARY KEY,
+                name TEXT NOT NULL,
+                description TEXT,
+                synonyms_json TEXT,
+                master_url TEXT,
+                categories_json TEXT,
+                vault_url TEXT,
+                total_reports INTEGER DEFAULT 0
+            );
+            """)
+
+            # Erowid Report Index table
+            cur.execute("""
+            CREATE TABLE IF NOT EXISTS erowid_report_index (
+                id INTEGER PRIMARY KEY,
+                substance_slug TEXT NOT NULL,
+                category TEXT,
+                title TEXT,
+                author TEXT,
+                status TEXT DEFAULT 'pending',
+                scraped_at TIMESTAMP
+            );
+            """)
+
             # Indexes
             cur.execute("CREATE INDEX IF NOT EXISTS idx_substances_slug ON substances(slug);")
             cur.execute("CREATE INDEX IF NOT EXISTS idx_exp_sub_expid ON experience_substances(experience_id);")
             cur.execute("CREATE INDEX IF NOT EXISTS idx_exp_sub_name ON experience_substances(substance_name);")
             cur.execute("CREATE INDEX IF NOT EXISTS idx_exp_tags_tag ON experience_tags(tag);")
             cur.execute("CREATE INDEX IF NOT EXISTS idx_adv_events_symptom ON adverse_events(symptom);")
+            cur.execute("CREATE INDEX IF NOT EXISTS idx_rep_idx_slug ON erowid_report_index(substance_slug);")
+            cur.execute("CREATE INDEX IF NOT EXISTS idx_rep_idx_status ON erowid_report_index(status);")
+            cur.execute("CREATE INDEX IF NOT EXISTS idx_catalog_name ON erowid_catalog(name);")
             conn.commit()
 
     # --- Substances Operations ---
@@ -584,3 +616,238 @@ class Database:
                 "top_adverse_symptoms": top_symptoms,
                 "top_reported_substances": top_substances
             }
+
+    # --- Erowid Master Catalog Operations ---
+
+    def save_catalog_entry(self, entry: CatalogEntry):
+        with self.get_connection() as conn:
+            cur = conn.cursor()
+            cur.execute("""
+            INSERT INTO erowid_catalog (slug, name, description, synonyms_json, master_url, categories_json, vault_url, total_reports)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+            ON CONFLICT(slug) DO UPDATE SET
+                name=excluded.name,
+                description=excluded.description,
+                synonyms_json=excluded.synonyms_json,
+                master_url=excluded.master_url,
+                categories_json=excluded.categories_json,
+                vault_url=excluded.vault_url,
+                total_reports=excluded.total_reports;
+            """, (
+                entry.slug,
+                entry.name,
+                entry.description,
+                json.dumps(entry.synonyms),
+                entry.master_url,
+                json.dumps(entry.categories),
+                entry.vault_url,
+                entry.total_reports
+            ))
+            conn.commit()
+
+    def bulk_save_catalog_entries(self, entries: List[CatalogEntry]) -> int:
+        with self.get_connection() as conn:
+            cur = conn.cursor()
+            data = [
+                (
+                    e.slug,
+                    e.name,
+                    e.description,
+                    json.dumps(e.synonyms),
+                    e.master_url,
+                    json.dumps(e.categories),
+                    e.vault_url,
+                    e.total_reports
+                ) for e in entries
+            ]
+            cur.executemany("""
+            INSERT INTO erowid_catalog (slug, name, description, synonyms_json, master_url, categories_json, vault_url, total_reports)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+            ON CONFLICT(slug) DO UPDATE SET
+                name=excluded.name,
+                description=excluded.description,
+                synonyms_json=excluded.synonyms_json,
+                master_url=excluded.master_url,
+                categories_json=excluded.categories_json,
+                vault_url=excluded.vault_url,
+                total_reports=excluded.total_reports;
+            """, data)
+            conn.commit()
+            return len(entries)
+
+    def get_catalog_entry(self, slug_or_name: str) -> Optional[CatalogEntry]:
+        norm = slug_or_name.strip().lower()
+        with self.get_connection() as conn:
+            cur = conn.cursor()
+            cur.execute("""
+            SELECT * FROM erowid_catalog
+            WHERE lower(slug) = ? OR lower(name) = ?
+            LIMIT 1;
+            """, (norm, norm))
+            row = cur.fetchone()
+            if not row:
+                # Try finding in synonyms
+                cur.execute("""
+                SELECT * FROM erowid_catalog
+                WHERE lower(synonyms_json) LIKE ?
+                LIMIT 1;
+                """, (f"%{norm}%",))
+                row = cur.fetchone()
+
+            if not row:
+                return None
+
+            return CatalogEntry(
+                slug=row["slug"],
+                name=row["name"],
+                description=row["description"] or "",
+                synonyms=json.loads(row["synonyms_json"] or "[]"),
+                master_url=row["master_url"] or "",
+                categories=json.loads(row["categories_json"] or "{}"),
+                vault_url=row["vault_url"],
+                total_reports=row["total_reports"] or 0
+            )
+
+    def search_catalog(self, query: str = "", limit: int = 50, offset: int = 0) -> List[Dict[str, Any]]:
+        norm = query.strip().lower() if query else ""
+        with self.get_connection() as conn:
+            cur = conn.cursor()
+            if norm:
+                cur.execute("""
+                SELECT * FROM erowid_catalog
+                WHERE lower(name) LIKE ? OR lower(slug) LIKE ? OR lower(description) LIKE ? OR lower(synonyms_json) LIKE ?
+                ORDER BY total_reports DESC, name ASC
+                LIMIT ? OFFSET ?;
+                """, (f"%{norm}%", f"%{norm}%", f"%{norm}%", f"%{norm}%", limit, offset))
+            else:
+                cur.execute("""
+                SELECT * FROM erowid_catalog
+                ORDER BY total_reports DESC, name ASC
+                LIMIT ? OFFSET ?;
+                """, (limit, offset))
+
+            rows = cur.fetchall()
+            results = []
+            for r in rows:
+                results.append({
+                    "slug": r["slug"],
+                    "name": r["name"],
+                    "description": r["description"] or "",
+                    "synonyms": json.loads(r["synonyms_json"] or "[]"),
+                    "master_url": r["master_url"] or "",
+                    "categories": json.loads(r["categories_json"] or "{}"),
+                    "vault_url": r["vault_url"],
+                    "total_reports": r["total_reports"] or 0
+                })
+            return results
+
+    def get_all_catalog_entries(self) -> List[CatalogEntry]:
+        with self.get_connection() as conn:
+            cur = conn.cursor()
+            cur.execute("SELECT * FROM erowid_catalog ORDER BY name ASC;")
+            rows = cur.fetchall()
+            return [
+                CatalogEntry(
+                    slug=r["slug"],
+                    name=r["name"],
+                    description=r["description"] or "",
+                    synonyms=json.loads(r["synonyms_json"] or "[]"),
+                    master_url=r["master_url"] or "",
+                    categories=json.loads(r["categories_json"] or "{}"),
+                    vault_url=r["vault_url"],
+                    total_reports=r["total_reports"] or 0
+                ) for r in rows
+            ]
+
+    # --- Report Index Operations ---
+
+    def save_report_index_items(self, items: List[ReportIndexItem]) -> int:
+        with self.get_connection() as conn:
+            cur = conn.cursor()
+            data = [
+                (it.id, it.substance_slug, it.category, it.title, it.author, it.status, it.scraped_at)
+                for it in items
+            ]
+            cur.executemany("""
+            INSERT INTO erowid_report_index (id, substance_slug, category, title, author, status, scraped_at)
+            VALUES (?, ?, ?, ?, ?, ?, ?)
+            ON CONFLICT(id) DO UPDATE SET
+                substance_slug=excluded.substance_slug,
+                category=COALESCE(excluded.category, erowid_report_index.category),
+                title=COALESCE(excluded.title, erowid_report_index.title),
+                author=COALESCE(excluded.author, erowid_report_index.author);
+            """, data)
+            conn.commit()
+            return len(items)
+
+    def get_unscraped_reports(
+        self,
+        substance_slug: Optional[str] = None,
+        category: Optional[str] = None,
+        limit: int = 50
+    ) -> List[ReportIndexItem]:
+        with self.get_connection() as conn:
+            cur = conn.cursor()
+            query = "SELECT * FROM erowid_report_index WHERE status = 'pending'"
+            params: List[Any] = []
+            if substance_slug:
+                query += " AND lower(substance_slug) = ?"
+                params.append(substance_slug.lower())
+            if category:
+                query += " AND lower(category) = ?"
+                params.append(category.lower())
+            query += " ORDER BY id ASC LIMIT ?"
+            params.append(limit)
+
+            cur.execute(query, params)
+            rows = cur.fetchall()
+            return [
+                ReportIndexItem(
+                    id=r["id"],
+                    substance_slug=r["substance_slug"],
+                    category=r["category"] or "General",
+                    title=r["title"] or "",
+                    author=r["author"] or "",
+                    status=r["status"] or "pending",
+                    scraped_at=r["scraped_at"]
+                ) for r in rows
+            ]
+
+    def mark_report_scraped(self, report_id: int):
+        with self.get_connection() as conn:
+            cur = conn.cursor()
+            cur.execute("""
+            UPDATE erowid_report_index
+            SET status = 'scraped', scraped_at = CURRENT_TIMESTAMP
+            WHERE id = ?;
+            """, (report_id,))
+            conn.commit()
+
+    def get_catalog_stats(self) -> Dict[str, Any]:
+        with self.get_connection() as conn:
+            cur = conn.cursor()
+            cur.execute("SELECT count(*) AS total_catalog_substances FROM erowid_catalog;")
+            total_cat = cur.fetchone()["total_catalog_substances"]
+
+            cur.execute("SELECT count(*) AS total_indexed_reports FROM erowid_report_index;")
+            total_indexed = cur.fetchone()["total_indexed_reports"]
+
+            cur.execute("SELECT count(*) AS total_scraped_reports FROM erowid_report_index WHERE status = 'scraped';")
+            total_scraped = cur.fetchone()["total_scraped_reports"]
+
+            cur.execute("""
+            SELECT category, count(*) AS count
+            FROM erowid_report_index
+            GROUP BY category
+            ORDER BY count DESC
+            LIMIT 10;
+            """)
+            top_cats = [dict(r) for r in cur.fetchall()]
+
+            return {
+                "total_catalog_substances": total_cat,
+                "total_indexed_reports": total_indexed,
+                "total_scraped_reports": total_scraped,
+                "top_categories": top_cats
+            }
+

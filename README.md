@@ -1,60 +1,71 @@
-# 🛡️ Erowid SafeDB: Systematic Harm Reduction & Experience Database
+# 🛡️ Erowid SafeDB: Systematic Harm Reduction & Universal Erowid Archive
 
-**Erowid SafeDB** is an open-source, evidence-based harm reduction system, clinical drug interaction engine, and systematic database built from Erowid's experience vault and pharmacological literature.
+**Erowid SafeDB** is an evidence-based harm reduction system, clinical drug interaction engine, and systematic offline/online archive built to index and access the complete breadth of information on Erowid (erowid.org).
 
-The project exists to make critical substance safety data, dangerous drug combination alerts, safe dosing guidelines, and real-world disaster case studies instantly accessible to reduce harm and prevent accidental drug-related deaths.
+The project enables open access to clinical monographs, lethal drug combination contraindications, dosing brackets, and thousands of real-world disaster and recovery case studies to reduce drug-related harm and prevent accidental deaths.
 
 ---
 
 ## ⚡ Key Capabilities
 
-1. **Systematic Substance Monographs & Vaults**
-   - Clinical pharmacology profiles, common/street slang names, addiction potential, and legal scheduling.
-   - Route-specific dosing brackets (*Threshold*, *Light*, *Common*, *Strong*, *Heavy*).
-   - Time-course curves (*Onset*, *Peak*, *Duration*, *After-effects*).
-   - Chemical reagent testing color references (*Marquis*, *Mecke*, *Simon's*, *Ehrlich*, *Hofmann*).
+1. **Master Erowid Archive Catalog (560+ Substances)**
+   - Complete indexed library extracted from Erowid's master directories (`exp_list.shtml` and `psychoactives.shtml`).
+   - Mapped category trees for every substance (*Health Problems*, *Bad Trips*, *Train Wrecks & Trip Disasters*, *Combinations*, *First Times*, *General*, etc.).
+   - Instant search across chemicals, research chemicals, botanicals, pharmaceuticals, and street analogs.
 
-2. **Multi-Drug Interaction & Lethality Checker**
+2. **Transparent On-Demand Fetching ("Access Any Report on Erowid")**
+   - Querying or viewing any Experience Report ID (from 1 to 150,000+) automatically fetches it live from the archive if not locally present, decompresses, extracts adverse symptoms, saves it into SQLite with FTS5, and displays it immediately.
+
+3. **Multi-Drug Interaction & Lethality Checker**
    - Direct database lookup for documented lethal and dangerous combinations (e.g. Alcohol + Xanax, MDMA + Tramadol, Cocaine + Alcohol cocaethylene toxicity).
    - Pharmacological fallback heuristics by mechanism (e.g. CNS depressant + depressant = synergistic respiratory arrest; MAOI + serotonergic = lethal serotonin syndrome; stimulant + stimulant = cardiovascular crisis).
 
-3. **Dosage Safety Evaluation**
-   - Real-time quantitative assessment of intended dose amounts against established threshold and overdose boundaries.
+4. **Dosage Safety Evaluation**
+   - Real-time quantitative assessment of intended dose amounts against established threshold, common, strong, and overdose boundaries.
 
-4. **Experience Vault & Full-Text Search (FTS5)**
+5. **Experience Vault & Full-Text Search (SQLite FTS5)**
    - High-performance SQLite FTS5 search across thousands of words of real trip reports.
    - Automated adverse clinical symptom extraction (`respiratory_depression`, `serotonin_syndrome`, `seizure`, `overdose`, `naloxone_administered`, `hospitalization`, `tachycardia`, `panic_attack`).
 
-5. **Archive-Resilient Scraper & Local Ingestion**
-   - Polite rate-limited scraping engine.
-   - Built-in local disk caching in `data/cache/experiences/`.
-   - Automatic Internet Archive Wayback Machine fallback to bypass Cloudflare bot restrictions on direct Erowid endpoints.
-   - Local HTML and directory batch import capabilities.
+6. **Harvester & High-Performance Parallel Scraper**
+   - Harvests all report IDs for any substance or high-risk category into the indexing queue.
+   - Parallel multi-threaded batch downloader with polite rate-limiting, gzip/deflate auto-decompression, and disk caching.
+   - Automatic Wayback Machine archive fallback to bypass Cloudflare bot restrictions on direct Erowid endpoints.
 
-6. **Dual Interface: Terminal CLI & Zero-Dependency Web App**
-   - Full command-line interface with ANSI color-coded danger alerts.
+7. **Dual Interface: Terminal CLI & Zero-Dependency Web Dashboard**
+   - Terminal CLI with ANSI color-coded danger alerts.
    - Responsive web dashboard and REST API served with Python standard library (`http.server`).
 
 ---
 
-## 🚀 Quick Start
+## 🚀 Quick Command Reference
 
-### 1. Initialize Database & Seed Baseline Monograph Data
+All commands run through [`run.py`](file:///Users/marksadler/erowid_safedb/run.py) from `/Users/marksadler/erowid_safedb`:
+
+### 1. Initialize & Seed Master Catalog
 ```bash
 python3 run.py init
 ```
-This prepares SQLite with WAL journaling, builds FTS5 search tables, and seeds initial substance monographs, high-risk drug interaction rules, and verified case studies.
 
-### 2. Substance Dossier Lookup
+### 2. Search Master Erowid Catalog (560+ Substances)
 ```bash
-python3 run.py substance mdma
-python3 run.py substance ketamine
-python3 run.py substance lsd
+# Search by keyword, chemical name, or slang
+python3 run.py catalog "dmt"
+python3 run.py catalog "ketamine"
+python3 run.py catalog "2c"
 ```
 
-### 3. Check Multi-Drug Combinations
+### 3. View Substance Profiles
 ```bash
-# Lethal depressant synergy
+# View clinical monograph or master catalog profile
+python3 run.py substance mdma
+python3 run.py substance 2cb
+python3 run.py substance dmt
+```
+
+### 4. Check Multi-Drug Interactions
+```bash
+# Lethal depressant synergy (fatal breathing failure)
 python3 run.py check-combo alcohol xanax
 
 # Fatal Serotonin Syndrome & seizure risk
@@ -64,48 +75,58 @@ python3 run.py check-combo mdma tramadol
 python3 run.py check-combo alcohol cocaine
 ```
 
-### 4. Check Dosage Safety
+### 5. Check Dosage Safety
 ```bash
-python3 run.py check-dose mdma 100
-python3 run.py check-dose mdma 250
+python3 run.py check-dose mdma 220
+python3 run.py check-dose psilocybin 2.0 --unit g
 ```
 
-### 5. Search the Experience Reports Vault
+### 6. Universal Report Viewer (On-Demand Fetching)
 ```bash
-# Keyword search with FTS5
-python3 run.py search "overdose"
-python3 run.py search "seizure" --substance tramadol
-python3 run.py search --symptom respiratory_depression
-
-# View full report narrative and clinical extraction
+# View any report by ID (fetches live if not already in local database)
 python3 run.py view 71809
+python3 run.py view 10000
+python3 run.py view 100
 ```
 
-### 6. Scrape Live / Archived Experience Reports
+### 7. Harvest & Batch Scrape Experience Reports
 ```bash
-# Fetch single experience by ID (auto-caches to disk)
-python3 run.py scrape --id 100
+# Harvest all report IDs for a substance into the queue
+python3 run.py harvest --substance 2cb
+python3 run.py harvest --substance ketamine
 
-# Batch scrape a range of IDs with polite delays
-python3 run.py scrape --range 100 110 --delay 2.0
+# Harvest priority safety reports (Health Problems, Bad Trips, Train Wrecks)
+python3 run.py harvest --priority
+
+# Batch download queued reports in parallel
+python3 run.py scrape --substance 2cb --limit 20 --workers 3
+python3 run.py scrape --priority --limit 20
 ```
 
-### 7. Launch Interactive Web UI & REST API
+### 8. Search Local Vault with Full-Text Search
+```bash
+python3 run.py search "overdose"
+python3 run.py search --symptom respiratory_depression
+python3 run.py search "seizure" --substance tramadol
+```
+
+### 9. Launch Web Dashboard & REST API
 ```bash
 python3 run.py web --port 8080
 ```
-Open [http://localhost:8080](http://localhost:8080) in any web browser to access:
-- Substance Catalog & Dosage Matrix
-- Interactive Multi-Drug Combination Calculator
-- Searchable Experience Vault with modal reader
-- Emergency Life-Saving Overdose Protocols & Reagent Testing Charts
-- Live Scraper Ingestion Console
+Navigate to **http://localhost:8080** for:
+- **Master Catalog (560+)**: Browse, search, and trigger report harvests.
+- **Universal Live Reader**: Enter any Erowid Report ID to read immediately.
+- **Interaction Checker**: Multi-substance combination calculator.
+- **Experience Vault**: Fast FTS5 search with modal reader.
+- **Emergency Protocols**: Actionable overdose protocols & reagent testing guides.
+- **Archive Harvester**: Real-time batch ingestion console.
 
 ---
 
 ## 🧪 Running Tests
 
-The test suite covers database CRUD, FTS5 searching, HTML regex parsing, symptom extraction, dosage assessment, and interaction logic:
+The test suite covers database CRUD, FTS5 searching, catalog indexing, harvester queues, HTTP decompression, symptom extraction, dosage assessment, and interaction logic:
 
 ```bash
 python3 -m unittest discover tests
@@ -118,21 +139,22 @@ python3 -m unittest discover tests
 ```
 erowid_safedb/
 ├── run.py                       # CLI and Web launcher
-├── README.md                    # Documentation & guide
+├── README.md                    # Project documentation & reference
 ├── data/
-│   ├── erowid_safedb.db         # SQLite database with FTS5 and WAL mode
-│   └── cache/                   # Local raw HTML disk cache
+│   ├── erowid_safedb.db         # SQLite database with FTS5, WAL mode & catalog
+│   └── cache/                   # Local raw HTML disk cache (reports & index pages)
 ├── erowid_safedb/
-│   ├── models.py                # Strongly-typed Dataclasses
-│   ├── db.py                    # SQLite schema, FTS5 full-text queries & indices
+│   ├── models.py                # Dataclasses (Substance, CatalogEntry, ReportIndexItem, etc.)
+│   ├── db.py                    # SQLite schema, FTS5 full-text queries & catalog tables
 │   ├── parsers.py               # Erowid HTML extraction & clinical NLP regexes
-│   ├── scraper.py               # Rate-limited scraper with Wayback Machine fallback
+│   ├── scraper.py               # Resilient scraper, catalog harvester & worker pool
 │   ├── harm_reduction.py        # Interaction matrix, dosage bounds & emergency protocol
 │   ├── seed_data.py             # Authoritative clinical monographs and case reports
 │   ├── cli.py                   # Argument parser & ANSI colorized terminal interface
 │   └── web.py                   # Zero-dependency HTTP server, SPA frontend & REST API
 └── tests/
-    ├── test_db.py               # Database tests
+    ├── test_db.py               # Database & FTS5 tests
     ├── test_parsers.py          # HTML & adverse symptom parser tests
-    └── test_harm_reduction.py   # Interaction and dosage evaluation tests
+    ├── test_harm_reduction.py   # Interaction and dosage evaluation tests
+    └── test_catalog.py          # Master catalog, harvester & decompression tests
 ```

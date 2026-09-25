@@ -97,3 +97,33 @@ class ExperienceReport:
 
     def to_dict(self) -> Dict[str, Any]:
         return asdict(self)
+
+
+@dataclass
+class CatalogEntry:
+    slug: str
+    name: str
+    description: str = ""
+    synonyms: List[str] = field(default_factory=list)
+    master_url: str = ""
+    categories: Dict[str, str] = field(default_factory=dict)
+    vault_url: Optional[str] = None
+    total_reports: int = 0
+
+    def to_dict(self) -> Dict[str, Any]:
+        return asdict(self)
+
+
+@dataclass
+class ReportIndexItem:
+    id: int
+    substance_slug: str
+    category: str = "General"
+    title: str = ""
+    author: str = ""
+    status: str = "pending"  # pending, scraped, failed
+    scraped_at: Optional[str] = None
+
+    def to_dict(self) -> Dict[str, Any]:
+        return asdict(self)
+
