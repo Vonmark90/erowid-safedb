@@ -39,6 +39,14 @@ class SafeDBRequestHandler(http.server.BaseHTTPRequestHandler):
             self.wfile.write(HTML_TEMPLATE.encode("utf-8"))
             return
 
+        if path in ["/app_icon.png", "/assets/app_icon.png"]:
+            icon_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "assets", "app_icon.png")
+            if os.path.exists(icon_path):
+                self._set_headers(200, "image/png")
+                with open(icon_path, "rb") as f:
+                    self.wfile.write(f.read())
+                return
+
         # API Endpoints
         if path == "/api/stats":
             stats = self.db.get_stats()
@@ -262,6 +270,7 @@ HTML_TEMPLATE = """<!DOCTYPE html>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Erowid SafeDB - Systematic Harm Reduction & Universal Archive</title>
+  <link rel="icon" type="image/png" href="/app_icon.png">
   <style>
     :root {
       --bg: #090d16;
@@ -556,7 +565,7 @@ HTML_TEMPLATE = """<!DOCTYPE html>
   <!-- Top Application Bar -->
   <header>
     <div class="brand-wrap">
-      <div class="brand-logo">🛡️</div>
+      <div class="brand-logo"><img src="/app_icon.png" style="width: 38px; height: 38px; border-radius: 9px; box-shadow: 0 0 12px rgba(56, 189, 248, 0.4); display: block;" onerror="this.onerror=null; this.parentElement.innerText='🛡️'"></div>
       <div>
         <div class="brand-title">Erowid SafeDB <span class="brand-version">v2.0 Native</span></div>
         <div class="brand-subtitle">Clinical Harm Reduction, Pharmacological Interaction Radar & Master Vault</div>
