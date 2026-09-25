@@ -1,6 +1,6 @@
-# 🛡️ Erowid SafeDB: Systematic Harm Reduction & Universal Erowid Archive
+# Drug Harm Reduction Codex and Overdose Radar
 
-**Erowid SafeDB** is an evidence-based harm reduction system, clinical drug interaction engine, and systematic offline/online archive built to index and access the complete breadth of information on Erowid (erowid.org).
+An evidence-based harm reduction system, clinical drug interaction engine, and systematic offline/online archive built to index and access the complete breadth of information on Erowid (erowid.org).
 
 The project enables open access to clinical monographs, lethal drug combination contraindications, dosing brackets, and thousands of real-world disaster and recovery case studies to reduce drug-related harm and prevent accidental deaths.
 
