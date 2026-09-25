@@ -708,23 +708,29 @@ class Database:
                 total_reports=row["total_reports"] or 0
             )
 
-    def search_catalog(self, query: str = "", limit: int = 50, offset: int = 0) -> List[Dict[str, Any]]:
+    def search_catalog(self, query: str = "", category: str = "", limit: int = 50, offset: int = 0) -> List[Dict[str, Any]]:
         norm = query.strip().lower() if query else ""
+        cat = category.strip().lower() if category else ""
         with self.get_connection() as conn:
             cur = conn.cursor()
+            conditions = []
+            params = []
             if norm:
-                cur.execute("""
-                SELECT * FROM erowid_catalog
-                WHERE lower(name) LIKE ? OR lower(slug) LIKE ? OR lower(description) LIKE ? OR lower(synonyms_json) LIKE ?
-                ORDER BY total_reports DESC, name ASC
-                LIMIT ? OFFSET ?;
-                """, (f"%{norm}%", f"%{norm}%", f"%{norm}%", f"%{norm}%", limit, offset))
-            else:
-                cur.execute("""
-                SELECT * FROM erowid_catalog
-                ORDER BY total_reports DESC, name ASC
-                LIMIT ? OFFSET ?;
-                """, (limit, offset))
+                conditions.append("(lower(name) LIKE ? OR lower(slug) LIKE ? OR lower(description) LIKE ? OR lower(synonyms_json) LIKE ?)")
+                params.extend([f"%{norm}%", f"%{norm}%", f"%{norm}%", f"%{norm}%"])
+            if cat:
+                conditions.append("(lower(categories_json) LIKE ? OR lower(description) LIKE ? OR lower(name) LIKE ?)")
+                params.extend([f"%{cat}%", f"%{cat}%", f"%{cat}%"])
+
+            where_sql = ("WHERE " + " AND ".join(conditions)) if conditions else ""
+            sql = f"""
+            SELECT * FROM erowid_catalog
+            {where_sql}
+            ORDER BY total_reports DESC, name ASC
+            LIMIT ? OFFSET ?;
+            """
+            params.extend([limit, offset])
+            cur.execute(sql, params)
 
             rows = cur.fetchall()
             results = []

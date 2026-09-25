@@ -16,3 +16,8 @@ data/*.sqlite*
 
 # Cache files
 data/cache/
+
+# Logs
+*.log
+data/*.log
+

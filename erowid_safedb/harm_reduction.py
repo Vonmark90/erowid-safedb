@@ -237,7 +237,20 @@ class HarmReductionEngine:
             "heavy": matching_dose.heavy,
             "notes": matching_dose.notes,
             "harm_summary": sub.harm_summary,
-            "toxicity_notes": sub.toxicity_notes
+            "toxicity_notes": sub.toxicity_notes,
+            "durations": [
+                {
+                    "route": dur.route,
+                    "onset": dur.onset,
+                    "coming_up": dur.coming_up,
+                    "peak": dur.peak,
+                    "plateau": dur.plateau,
+                    "coming_down": dur.coming_down,
+                    "after_effects": dur.after_effects,
+                    "total_duration": dur.total_duration,
+                }
+                for dur in sub.durations
+            ]
         }
 
     @staticmethod

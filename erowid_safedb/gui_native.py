@@ -307,15 +307,45 @@ class SafeDBNativeApp:
         input_box.pack(fill="x", padx=20, pady=10)
 
         ctk.CTkLabel(input_box, text="Enter 2 or more substances (comma-separated):", font=ctk.CTkFont(size=13, weight="bold")).pack(anchor="w", padx=15, pady=(12, 4))
-        self.combo_entry = ctk.CTkEntry(input_box, placeholder_text="e.g. Alcohol, Xanax or MDMA, Tramadol or Cocaine, Alcohol")
-        self.combo_entry.pack(fill="x", padx=15, pady=4)
-        self.combo_entry.bind("<Return>", lambda e: self._check_combo())
+        # Quick add chips row
+        quick_frame = ctk.CTkFrame(input_box, fg_color="transparent")
+        quick_frame.pack(fill="x", padx=15, pady=(8, 4))
+        ctk.CTkLabel(quick_frame, text="Quick Add:", font=ctk.CTkFont(size=12, weight="bold"), text_color="#38bdf8").pack(side="left", padx=(0, 6))
 
-        btn_eval = ctk.CTkButton(input_box, text="Check Lethal & Severe Interactions", fg_color="#0284c7", command=self._check_combo)
-        btn_eval.pack(anchor="w", padx=15, pady=(8, 15))
+        quick_subs = ["Alcohol", "MDMA", "Cannabis", "Cocaine", "Ketamine", "Alprazolam", "Oxycodone", "LSD", "Psilocybin", "Amphetamine", "DXM", "SSRI"]
+        for qs in quick_subs:
+            btn_q = ctk.CTkButton(
+                quick_frame, text=f"+ {qs}", width=70, height=22, fg_color="#334155", hover_color="#0284c7",
+                command=lambda s=qs: self._append_combo_sub(s)
+            )
+            btn_q.pack(side="left", padx=3)
+
+        btn_row = ctk.CTkFrame(input_box, fg_color="transparent")
+        btn_row.pack(fill="x", padx=15, pady=(8, 15))
+
+        btn_eval = ctk.CTkButton(btn_row, text="⚡ Check Combination Risks", fg_color="#0284c7", command=self._check_combo)
+        btn_eval.pack(side="left", padx=(0, 10))
+
+        btn_clear = ctk.CTkButton(btn_row, text="Clear All", width=80, fg_color="#334155", hover_color="#ef4444", command=self._clear_combo)
+        btn_clear.pack(side="left")
 
         self.combo_result_frame = ctk.CTkScrollableFrame(view, fg_color="#1e293b", height=350)
         self.combo_result_frame.pack(fill="both", expand=True, padx=20, pady=10)
+
+    def _append_combo_sub(self, name: str):
+        cur = self.combo_entry.get().strip()
+        items = [s.strip() for s in cur.split(",") if s.strip()]
+        if name not in items:
+            items.append(name)
+            self.combo_entry.delete(0, "end")
+            self.combo_entry.insert(0, ", ".join(items))
+            if len(items) >= 2:
+                self._check_combo()
+
+    def _clear_combo(self):
+        self.combo_entry.delete(0, "end")
+        for w in self.combo_result_frame.winfo_children():
+            w.destroy()
 
     def _check_combo(self):
         for w in self.combo_result_frame.winfo_children():
@@ -362,6 +392,28 @@ class SafeDBNativeApp:
         calc_box = ctk.CTkFrame(view, fg_color="#1e293b")
         calc_box.pack(fill="x", padx=20, pady=10)
 
+        # Quick dose presets
+        quick_dose_row = ctk.CTkFrame(calc_box, fg_color="transparent")
+        quick_dose_row.pack(fill="x", padx=15, pady=(8, 0))
+        ctk.CTkLabel(quick_dose_row, text="Quick Select:", font=ctk.CTkFont(size=12, weight="bold"), text_color="#38bdf8").pack(side="left", padx=(0, 6))
+
+        presets = [
+            ("MDMA", "120", "mg"),
+            ("Ketamine", "60", "mg"),
+            ("Psilocybin Mushrooms", "2.0", "g"),
+            ("LSD", "100", "ug"),
+            ("Alprazolam", "0.5", "mg"),
+            ("Cocaine", "50", "mg"),
+            ("DXM", "250", "mg"),
+            ("2C-B", "15", "mg"),
+        ]
+        for pname, pamt, punit in presets:
+            btn_p = ctk.CTkButton(
+                quick_dose_row, text=f"{pname.split()[0]} ({pamt}{punit})", width=95, height=22, fg_color="#334155", hover_color="#0284c7",
+                command=lambda n=pname, a=pamt, u=punit: self._set_dose_preset(n, a, u)
+            )
+            btn_p.pack(side="left", padx=3)
+
         # Fields
         f_row = ctk.CTkFrame(calc_box, fg_color="transparent")
         f_row.pack(fill="x", padx=15, pady=10)
@@ -383,6 +435,14 @@ class SafeDBNativeApp:
 
         self.dose_res_box = ctk.CTkFrame(view, fg_color="#1e293b", height=300)
         self.dose_res_box.pack(fill="both", expand=True, padx=20, pady=10)
+
+    def _set_dose_preset(self, name: str, amt: str, unit: str):
+        self.dose_sub_entry.delete(0, "end")
+        self.dose_sub_entry.insert(0, name)
+        self.dose_amt_entry.delete(0, "end")
+        self.dose_amt_entry.insert(0, amt)
+        self.dose_unit_menu.set(unit)
+        self._eval_dose()
 
     def _eval_dose(self):
         for w in self.dose_res_box.winfo_children():
