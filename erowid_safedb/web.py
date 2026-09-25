@@ -608,7 +608,7 @@ HTML_TEMPLATE = """<!DOCTYPE html>
     <button onclick="switchNav('catalog')">📚 Master Catalog (560+)</button>
     <button onclick="switchNav('vault')">📖 Trip Vault</button>
     <button onclick="switchNav('reagents')">🧪 Reagents & Test Strips</button>
-    <button onclick="switchNav('harvester')">📥 Archive Harvester</button>
+    <button onclick="switchNav('harvester')">💾 Offline Database</button>
   </nav>
 
   <main>
@@ -884,14 +884,14 @@ HTML_TEMPLATE = """<!DOCTYPE html>
       </div>
     </div>
 
-    <!-- TAB 6: ARCHIVE INGESTION CONSOLE -->
+    <!-- TAB 6: OFFLINE DATABASE CONSOLE -->
     <div id="tab-harvester" class="tab-content">
       <div class="card">
         <div class="card-header">
-          <div class="card-title">📥 Archive Harvester & Parallel Batch Queue</div>
+          <div class="card-title">💾 Offline Database & Ingestion Queue</div>
         </div>
         <p style="color: var(--text-muted); font-size: 0.85rem; margin-bottom: 1.2rem;">
-          Control mass ingestion of Erowid experience reports. Harvest report IDs from category index pages and batch scrape full reports in parallel.
+          Manage local offline database storage and batch ingestion of Erowid experience reports. Harvest report IDs from category index pages and batch scrape full reports for offline access.
         </p>
 
         <div class="grid-2" style="margin-bottom: 1.2rem;">

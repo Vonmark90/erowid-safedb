@@ -141,7 +141,7 @@ Navigate to **http://localhost:8080** for:
 - **Interaction Checker**: Multi-substance combination calculator.
 - **Experience Vault**: Fast FTS5 search with modal reader.
 - **Emergency Protocols**: Actionable overdose protocols & reagent testing guides.
-- **Archive Harvester**: Real-time batch ingestion console.
+- **Offline Database**: Real-time batch ingestion console and local storage manager.
 
 ---
 

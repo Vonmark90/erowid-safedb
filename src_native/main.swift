@@ -272,7 +272,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, WKNavigati
         navMenu.addItem(withTitle: "📚 Master Catalog (560+)", action: #selector(navCatalog), keyEquivalent: "3")
         navMenu.addItem(withTitle: "📖 Experience Vault", action: #selector(navVault), keyEquivalent: "4")
         navMenu.addItem(withTitle: "🧪 Reagents & Test Strips", action: #selector(navReagents), keyEquivalent: "5")
-        navMenu.addItem(withTitle: "📥 Archive Harvester", action: #selector(navHarvester), keyEquivalent: "6")
+        navMenu.addItem(withTitle: "💾 Offline Database", action: #selector(navHarvester), keyEquivalent: "6")
         navMenu.addItem(NSMenuItem.separator())
         let emergencyItem = NSMenuItem(title: "🚨 Emergency Overdose Protocol", action: #selector(navEmergency), keyEquivalent: "e")
         emergencyItem.keyEquivalentModifierMask = [.command]
