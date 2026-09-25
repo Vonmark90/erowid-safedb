@@ -60,7 +60,7 @@ def launch_web_gui(db_path: str = "data/erowid_safedb.db", port: int = 8080):
     SafeDBRequestHandler.engine = HarmReductionEngine(db)
     SafeDBRequestHandler.scraper = scraper
 
-    server = http.server.HTTPServer(("0.0.0.0", actual_port), SafeDBRequestHandler)
+    server = http.server.ThreadingHTTPServer(("0.0.0.0", actual_port), SafeDBRequestHandler)
 
     print("\n" + "=" * 65)
     print("  🛡️  EROWID SAFEDB - DESKTOP GUI APPLICATION")
@@ -107,7 +107,7 @@ def run_headless_server(db_path: str = "data/erowid_safedb.db", port: int = 8080
     SafeDBRequestHandler.engine = HarmReductionEngine(db)
     SafeDBRequestHandler.scraper = scraper
 
-    server = http.server.HTTPServer(("127.0.0.1", port), SafeDBRequestHandler)
+    server = http.server.ThreadingHTTPServer(("127.0.0.1", port), SafeDBRequestHandler)
     print(f"EROWID_SERVER_READY:{port}", flush=True)
     try:
         server.serve_forever()

@@ -3,6 +3,7 @@ Zero-dependency HTTP Web Server and Harm Reduction Dashboard for Erowid SafeDB.
 Serves a responsive single-page application and RESTful JSON API with master catalog access.
 """
 
+import os
 import http.server
 import json
 import urllib.parse
@@ -17,18 +18,29 @@ class SafeDBRequestHandler(http.server.BaseHTTPRequestHandler):
     engine: HarmReductionEngine = None
     scraper: ErowidScraper = None
 
+    def log_message(self, format, *args):
+        # Silence default stderr logging to prevent BrokenPipeError in headless mode
+        pass
+
     def _set_headers(self, status: int = 200, content_type: str = "application/json"):
         self.send_response(status)
         self.send_header("Content-Type", f"{content_type}; charset=utf-8")
         self.send_header("Access-Control-Allow-Origin", "*")
         self.send_header("Access-Control-Allow-Methods", "GET, POST, OPTIONS")
         self.send_header("Access-Control-Allow-Headers", "Content-Type")
+        self.send_header("Connection", "close")
         self.end_headers()
 
     def do_OPTIONS(self):
         self._set_headers(200)
 
     def do_GET(self):
+        try:
+            self._handle_get()
+        except (BrokenPipeError, ConnectionResetError):
+            pass
+
+    def _handle_get(self):
         parsed = urllib.parse.urlparse(self.path)
         path = parsed.path
         query = urllib.parse.parse_qs(parsed.query)
@@ -173,6 +185,12 @@ class SafeDBRequestHandler(http.server.BaseHTTPRequestHandler):
         self.wfile.write(json.dumps({"error": "Endpoint not found"}).encode("utf-8"))
 
     def do_POST(self):
+        try:
+            self._handle_post()
+        except (BrokenPipeError, ConnectionResetError):
+            pass
+
+    def _handle_post(self):
         parsed = urllib.parse.urlparse(self.path)
         path = parsed.path
         length = int(self.headers.get("Content-Length", 0))
@@ -254,7 +272,7 @@ def start_server(db: Database, port: int = 8080):
         except Exception:
             pass
 
-    server = http.server.HTTPServer(("0.0.0.0", port), SafeDBRequestHandler)
+    server = http.server.ThreadingHTTPServer(("0.0.0.0", port), SafeDBRequestHandler)
     print(f"\n🌐 Erowid SafeDB Web Interface running at: http://localhost:{port}")
     print("Press Ctrl+C to stop the server.\n")
     try:
