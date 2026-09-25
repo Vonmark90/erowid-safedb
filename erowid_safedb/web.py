@@ -310,7 +310,7 @@ HTML_TEMPLATE = """<!DOCTYPE html>
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Erowid SafeDB Pro — Clinical Harm Reduction & Pharmacological Radar</title>
+  <title>Drug Harm Reduction Codex and Overdose Radar</title>
   <link rel="icon" type="image/png" href="/app_icon.png">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -999,11 +999,11 @@ HTML_TEMPLATE = """<!DOCTYPE html>
       </div>
       <div class="brand-title-wrap">
         <div class="brand-title">
-          EROWID SAFEDB
-          <span class="brand-badge">v2.5 PRO</span>
+          DRUG HARM REDUCTION CODEX
+          <span class="brand-badge">OVERDOSE RADAR</span>
         </div>
         <div class="brand-subtitle">
-          Clinical Pharmacology Workstation • Multi-Drug Harm Reduction Radar
+          Overdose Radar & Clinical Pharmacology Workstation • Master Harm Reduction Vault
         </div>
       </div>
     </div>

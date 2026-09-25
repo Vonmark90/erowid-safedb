@@ -34,14 +34,14 @@ jobs:
 
       - name: Build Windows Executable
         run: |
-          pyinstaller --noconfirm --onefile --windowed --name "ErowidSafeDB" --add-data "data;data" --add-data "assets;assets" gui.py
-          Compress-Archive -Path dist\ErowidSafeDB.exe -DestinationPath ErowidSafeDB-Windows-x64.zip
+          pyinstaller --noconfirm --onefile --windowed --name "DrugHarmReductionCodex" --add-data "data;data" --add-data "assets;assets" gui.py
+          Compress-Archive -Path dist\DrugHarmReductionCodex.exe -DestinationPath DrugHarmReductionCodex-Windows-x64.zip
 
       - name: Upload Windows Artifact
         uses: actions/upload-artifact@v4
         with:
           name: windows-binary
-          path: ErowidSafeDB-Windows-x64.zip
+          path: DrugHarmReductionCodex-Windows-x64.zip
 
   build-linux:
     name: Build Linux Standalone Executable
@@ -62,14 +62,14 @@ jobs:
 
       - name: Build Linux Binary
         run: |
-          pyinstaller --noconfirm --onefile --name "ErowidSafeDB" --add-data "data:data" --add-data "assets:assets" gui.py
-          tar -czvf ErowidSafeDB-Linux-x64.tar.gz -C dist ErowidSafeDB
+          pyinstaller --noconfirm --onefile --name "DrugHarmReductionCodex" --add-data "data:data" --add-data "assets:assets" gui.py
+          tar -czvf DrugHarmReductionCodex-Linux-x64.tar.gz -C dist DrugHarmReductionCodex
 
       - name: Upload Linux Artifact
         uses: actions/upload-artifact@v4
         with:
           name: linux-binary
-          path: ErowidSafeDB-Linux-x64.tar.gz
+          path: DrugHarmReductionCodex-Linux-x64.tar.gz
 
   build-macos:
     name: Build macOS Standalone App Bundle (.zip)
@@ -81,20 +81,20 @@ jobs:
       - name: Compile Native Cocoa Wrapper and Bundle Resources
         run: |
           mkdir -p bin
-          swiftc -O -framework Cocoa -framework WebKit src_native/main.swift -o bin/ErowidSafeDB
-          mkdir -p "Erowid SafeDB.app/Contents/MacOS" "Erowid SafeDB.app/Contents/Resources"
-          cp bin/ErowidSafeDB "Erowid SafeDB.app/Contents/MacOS/ErowidSafeDB"
-          cp gui.py "Erowid SafeDB.app/Contents/Resources/"
-          cp -R erowid_safedb "Erowid SafeDB.app/Contents/Resources/"
-          cp -R data "Erowid SafeDB.app/Contents/Resources/"
-          cp -R assets "Erowid SafeDB.app/Contents/Resources/"
-          ditto -c -k --sequesterRsrc --keepParent "Erowid SafeDB.app" ErowidSafeDB-macOS.zip
+          swiftc -O -framework Cocoa -framework WebKit src_native/main.swift -o bin/DrugHarmReductionCodex
+          mkdir -p "Drug Harm Reduction Codex and Overdose Radar.app/Contents/MacOS" "Drug Harm Reduction Codex and Overdose Radar.app/Contents/Resources"
+          cp bin/DrugHarmReductionCodex "Drug Harm Reduction Codex and Overdose Radar.app/Contents/MacOS/DrugHarmReductionCodex"
+          cp gui.py "Drug Harm Reduction Codex and Overdose Radar.app/Contents/Resources/"
+          cp -R erowid_safedb "Drug Harm Reduction Codex and Overdose Radar.app/Contents/Resources/"
+          cp -R data "Drug Harm Reduction Codex and Overdose Radar.app/Contents/Resources/"
+          cp -R assets "Drug Harm Reduction Codex and Overdose Radar.app/Contents/Resources/"
+          ditto -c -k --sequesterRsrc --keepParent "Drug Harm Reduction Codex and Overdose Radar.app" DrugHarmReductionCodex-macOS.zip
 
       - name: Upload macOS Artifact
         uses: actions/upload-artifact@v4
         with:
           name: macos-binary
-          path: ErowidSafeDB-macOS.zip
+          path: DrugHarmReductionCodex-macOS.zip
 
   publish-release:
     name: Publish Standalone GitHub Release
@@ -134,22 +134,22 @@ jobs:
           echo "Target Release Tag: $TAG_NAME"
 
           cat << 'EOF' > release_notes.md
-          ### 🚀 Erowid SafeDB Standalone Releases
+          ### 🚀 Drug Harm Reduction Codex and Overdose Radar Standalone Releases
 
           Pre-compiled, self-contained standalone applications for macOS, Windows, and Linux. No Python installation required!
 
-          - 🍏 **macOS**: Download `ErowidSafeDB-macOS.zip`, unzip, and launch **Erowid SafeDB.app**.
-          - 🪟 **Windows**: Download `ErowidSafeDB-Windows-x64.zip`, extract, and launch **ErowidSafeDB.exe**.
-          - 🐧 **Linux**: Download `ErowidSafeDB-Linux-x64.tar.gz`, extract (`tar -xvf ErowidSafeDB-Linux-x64.tar.gz`), and run `./ErowidSafeDB`.
+          - 🍏 **macOS**: Download `DrugHarmReductionCodex-macOS.zip`, unzip, and launch **Drug Harm Reduction Codex and Overdose Radar.app**.
+          - 🪟 **Windows**: Download `DrugHarmReductionCodex-Windows-x64.zip`, extract, and launch **DrugHarmReductionCodex.exe**.
+          - 🐧 **Linux**: Download `DrugHarmReductionCodex-Linux-x64.tar.gz`, extract (`tar -xvf DrugHarmReductionCodex-Linux-x64.tar.gz`), and run `./DrugHarmReductionCodex`.
           EOF
 
           # Check if release exists; if so, upload assets to it. Otherwise create it.
           if gh release view "$TAG_NAME" >/dev/null 2>&1; then
             echo "Release $TAG_NAME exists. Uploading/overwriting standalone assets..."
-            gh release upload "$TAG_NAME" ErowidSafeDB-Windows-x64.zip ErowidSafeDB-Linux-x64.tar.gz ErowidSafeDB-macOS.zip --clobber
+            gh release upload "$TAG_NAME" DrugHarmReductionCodex-Windows-x64.zip DrugHarmReductionCodex-Linux-x64.tar.gz DrugHarmReductionCodex-macOS.zip --clobber
           else
             echo "Creating new release $TAG_NAME..."
-            gh release create "$TAG_NAME" ErowidSafeDB-Windows-x64.zip ErowidSafeDB-Linux-x64.tar.gz ErowidSafeDB-macOS.zip \
-              --title "Erowid SafeDB Pro $TAG_NAME — Standalone Applications" \
+            gh release create "$TAG_NAME" DrugHarmReductionCodex-Windows-x64.zip DrugHarmReductionCodex-Linux-x64.tar.gz DrugHarmReductionCodex-macOS.zip \
+              --title "Drug Harm Reduction Codex and Overdose Radar $TAG_NAME" \
               --notes-file release_notes.md
           fi

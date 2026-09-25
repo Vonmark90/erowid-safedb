@@ -1,6 +1,6 @@
-# Drug Harm Reduction Codex and Overdose Radar
+# 🛡️ Drug Harm Reduction Codex and Overdose Radar
 
-An evidence-based harm reduction system, clinical drug interaction engine, and systematic offline/online archive built to index and access the complete breadth of information on Erowid (erowid.org).
+**Drug Harm Reduction Codex and Overdose Radar** is an evidence-based clinical harm reduction system, multi-drug interaction engine, and systematic offline/online archive built to index and access the complete breadth of clinical monographs and psychoactive harm-reduction knowledge.
 
 The project enables open access to clinical monographs, lethal drug combination contraindications, dosing brackets, and thousands of real-world disaster and recovery case studies to reduce drug-related harm and prevent accidental deaths.
 
@@ -8,13 +8,13 @@ The project enables open access to clinical monographs, lethal drug combination 
 
 ## 🚀 Download Standalone Apps (No Python Required)
 
-Pre-built, self-contained standalone desktop applications are available directly from the **[GitHub Releases Page](https://github.com/Vonmark90/erowid-safedb/releases/tag/v2.5.0)**:
+Pre-built, self-contained standalone desktop applications are available directly from the **[GitHub Releases Page](https://github.com/Vonmark90/drug-harm-reduction-codex-and-overdose-radar/releases/tag/v2.5.0)**:
 
 | Platform | Download | Launch Instructions |
 | :--- | :--- | :--- |
-| 🍏 **macOS** | [**`ErowidSafeDB-macOS.zip`**](https://github.com/Vonmark90/erowid-safedb/releases/download/v2.5.0/ErowidSafeDB-macOS.zip) | Unzip and launch **`Erowid SafeDB.app`** |
-| 🪟 **Windows** | [**`ErowidSafeDB-Windows-x64.zip`**](https://github.com/Vonmark90/erowid-safedb/releases/download/v2.5.0/ErowidSafeDB-Windows-x64.zip) | Unzip and double-click **`ErowidSafeDB.exe`** |
-| 🐧 **Linux** | [**`ErowidSafeDB-Linux-x64.tar.gz`**](https://github.com/Vonmark90/erowid-safedb/releases/download/v2.5.0/ErowidSafeDB-Linux-x64.tar.gz) | `tar -xvf ErowidSafeDB-Linux-x64.tar.gz && ./ErowidSafeDB` |
+| 🍏 **macOS** | [**`DrugHarmReductionCodex-macOS.zip`**](https://github.com/Vonmark90/drug-harm-reduction-codex-and-overdose-radar/releases/download/v2.5.0/DrugHarmReductionCodex-macOS.zip) | Unzip and launch **`Drug Harm Reduction Codex and Overdose Radar.app`** |
+| 🪟 **Windows** | [**`DrugHarmReductionCodex-Windows-x64.zip`**](https://github.com/Vonmark90/drug-harm-reduction-codex-and-overdose-radar/releases/download/v2.5.0/DrugHarmReductionCodex-Windows-x64.zip) | Unzip and double-click **`DrugHarmReductionCodex.exe`** |
+| 🐧 **Linux** | [**`DrugHarmReductionCodex-Linux-x64.tar.gz`**](https://github.com/Vonmark90/drug-harm-reduction-codex-and-overdose-radar/releases/download/v2.5.0/DrugHarmReductionCodex-Linux-x64.tar.gz) | `tar -xvf DrugHarmReductionCodex-Linux-x64.tar.gz && ./DrugHarmReductionCodex` |
 
 ---
 

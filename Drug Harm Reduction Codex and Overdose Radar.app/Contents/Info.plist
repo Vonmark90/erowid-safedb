@@ -3,15 +3,15 @@
 <plist version="1.0">
 <dict>
     <key>CFBundleExecutable</key>
-    <string>ErowidSafeDB</string>
+    <string>DrugHarmReductionCodex</string>
     <key>CFBundleIconFile</key>
     <string>AppIcon</string>
     <key>CFBundleIdentifier</key>
-    <string>org.erowidsafedb.desktop</string>
+    <string>org.drugharmreductioncodex.desktop</string>
     <key>CFBundleName</key>
-    <string>Erowid SafeDB</string>
+    <string>Drug Harm Reduction Codex and Overdose Radar</string>
     <key>CFBundleDisplayName</key>
-    <string>Erowid SafeDB</string>
+    <string>Drug Harm Reduction Codex and Overdose Radar</string>
     <key>CFBundlePackageType</key>
     <string>APPL</string>
     <key>CFBundleShortVersionString</key>

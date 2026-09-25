@@ -53,8 +53,8 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, WKNavigati
         </head>
         <body>
           <div class="spinner"></div>
-          <h2>Erowid SafeDB</h2>
-          <p>Initializing Harm Reduction Engine & Master Vault...</p>
+          <h2>Drug Harm Reduction Codex</h2>
+          <p>Overdose Radar & Harm Reduction Workstation...</p>
         </body>
         </html>
         """
@@ -209,7 +209,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, WKNavigati
             defer: false
         )
 
-        window.title = "Erowid SafeDB - Harm Reduction & Universal Archive"
+        window.title = "Drug Harm Reduction Codex and Overdose Radar"
         window.titleVisibility = .hidden
         window.titlebarAppearsTransparent = true
         window.appearance = NSAppearance(named: .darkAqua)
@@ -262,15 +262,15 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, WKNavigati
         // 1. App Menu
         let appMenuItem = NSMenuItem()
         let appMenu = NSMenu()
-        appMenu.addItem(withTitle: "About Erowid SafeDB", action: #selector(showAbout), keyEquivalent: "")
+        appMenu.addItem(withTitle: "About Drug Harm Reduction Codex", action: #selector(showAbout), keyEquivalent: "")
         appMenu.addItem(NSMenuItem.separator())
-        appMenu.addItem(withTitle: "Hide Erowid SafeDB", action: #selector(NSApplication.hide(_:)), keyEquivalent: "h")
+        appMenu.addItem(withTitle: "Hide Drug Harm Reduction Codex", action: #selector(NSApplication.hide(_:)), keyEquivalent: "h")
         let hideOthers = NSMenuItem(title: "Hide Others", action: #selector(NSApplication.hideOtherApplications(_:)), keyEquivalent: "h")
         hideOthers.keyEquivalentModifierMask = [.command, .option]
         appMenu.addItem(hideOthers)
         appMenu.addItem(withTitle: "Show All", action: #selector(NSApplication.unhideAllApplications(_:)), keyEquivalent: "")
         appMenu.addItem(NSMenuItem.separator())
-        appMenu.addItem(withTitle: "Quit Erowid SafeDB", action: #selector(NSApplication.terminate(_:)), keyEquivalent: "q")
+        appMenu.addItem(withTitle: "Quit Drug Harm Reduction Codex", action: #selector(NSApplication.terminate(_:)), keyEquivalent: "q")
         appMenuItem.submenu = appMenu
         mainMenu.addItem(appMenuItem)
 
@@ -334,7 +334,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, WKNavigati
 
     @objc func showAbout() {
         let alert = NSAlert()
-        alert.messageText = "Erowid SafeDB v2.0"
+        alert.messageText = "Drug Harm Reduction Codex & Overdose Radar v2.5"
         alert.informativeText = "Evidence-based Harm Reduction, Clinical Drug Interaction Radar & Universal Erowid Archive.\n\nOffline-ready systematic database containing 561 psychoactive substances, multi-drug contraindication engine, dosage ladder brackets, and on-demand trip vault."
         alert.alertStyle = .informational
         alert.addButton(withTitle: "OK")

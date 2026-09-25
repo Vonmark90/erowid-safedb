@@ -98,7 +98,7 @@ def launch_web_gui(db_path: str = "data/erowid_safedb.db", port: int = 8080):
     server = http.server.ThreadingHTTPServer(("0.0.0.0", actual_port), SafeDBRequestHandler)
 
     print("\n" + "=" * 65)
-    print("  🛡️  EROWID SAFEDB - DESKTOP GUI APPLICATION")
+    print("  🛡️  DRUG HARM REDUCTION CODEX & OVERDOSE RADAR")
     print("=" * 65)
     print(f"  URL:       {url}")
     print(f"  Database:  {os.path.abspath(db_path)}")
@@ -181,17 +181,16 @@ def main():
 
     # On macOS: Launch native macOS Cocoa desktop app if compiled binary is available
     base_dir = os.path.dirname(os.path.abspath(__file__))
-    native_bin = os.path.join(base_dir, "bin", "ErowidSafeDB")
-    app_bundle_bin = os.path.join(base_dir, "Erowid SafeDB.app", "Contents", "MacOS", "ErowidSafeDB")
-    if not (os.path.exists(app_bundle_bin) and os.access(app_bundle_bin, os.X_OK)):
-        app_bundle_bin = os.path.expanduser("~/Desktop/Erowid SafeDB.app/Contents/MacOS/ErowidSafeDB")
-
-    if os.path.exists(native_bin) and os.access(native_bin, os.X_OK):
-        print("🖥️ Launching Native macOS Cocoa Desktop Application...")
-        os.execv(native_bin, [native_bin])
-    elif os.path.exists(app_bundle_bin) and os.access(app_bundle_bin, os.X_OK):
-        print("🖥️ Launching Desktop Application Bundle...")
-        os.execv(app_bundle_bin, [app_bundle_bin])
+    candidates = [
+        os.path.join(base_dir, "bin", "DrugHarmReductionCodex"),
+        os.path.join(base_dir, "Drug Harm Reduction Codex and Overdose Radar.app", "Contents", "MacOS", "DrugHarmReductionCodex"),
+        os.path.join(base_dir, "bin", "ErowidSafeDB"),
+        os.path.join(base_dir, "Erowid SafeDB.app", "Contents", "MacOS", "ErowidSafeDB"),
+    ]
+    for binary in candidates:
+        if os.path.exists(binary) and os.access(binary, os.X_OK):
+            print("🖥️ Launching Native macOS Cocoa Desktop Application...")
+            os.execv(binary, [binary])
     else:
         # Fallback to browser GUI
         launch_web_gui(db_path=args.db, port=args.port)
