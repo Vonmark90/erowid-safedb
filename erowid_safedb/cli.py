@@ -101,6 +101,11 @@ Examples:
     web_parser = subparsers.add_parser("web", help="Launch interactive Web Dashboard & API")
     web_parser.add_argument("--port", type=int, default=8080, help="Port to bind web server (default: 8080)")
 
+    # Command: gui
+    gui_parser = subparsers.add_parser("gui", help="Launch interactive Desktop GUI Application")
+    gui_parser.add_argument("--native", action="store_true", help="Launch native CustomTkinter window")
+    gui_parser.add_argument("--port", type=int, default=8080, help="Port for web GUI (default: 8080)")
+
     args = parser.parse_args()
 
     if not args.command:
@@ -398,6 +403,14 @@ Examples:
 
     elif args.command == "web":
         start_server(db, port=args.port)
+
+    elif args.command == "gui":
+        if args.native:
+            from erowid_safedb.gui_native import launch_native_gui
+            launch_native_gui(args.db)
+        else:
+            from gui import launch_web_gui
+            launch_web_gui(db_path=args.db, port=args.port)
 
 
 if __name__ == "__main__":

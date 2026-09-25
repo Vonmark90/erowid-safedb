@@ -32,9 +32,30 @@ The project enables open access to clinical monographs, lethal drug combination 
    - Parallel multi-threaded batch downloader with polite rate-limiting, gzip/deflate auto-decompression, and disk caching.
    - Automatic Wayback Machine archive fallback to bypass Cloudflare bot restrictions on direct Erowid endpoints.
 
-7. **Dual Interface: Terminal CLI & Zero-Dependency Web Dashboard**
-   - Terminal CLI with ANSI color-coded danger alerts.
-   - Responsive web dashboard and REST API served with Python standard library (`http.server`).
+7. **Desktop GUI Application & Dual Interfaces**
+   - **Clickable macOS Desktop App**: Double-click [`Erowid SafeDB.app`](file:///Users/marksadler/erowid_safedb/Erowid%20SafeDB.app) or [`Launch_GUI.command`](file:///Users/marksadler/erowid_safedb/Launch_GUI.command).
+   - **Interactive Desktop App**: Launch via `python3 gui.py` or `python3 run.py gui` with automatic browser popup.
+   - **Native CustomTkinter Desktop Window**: Launch with `python3 gui.py --native`.
+   - **Terminal CLI**: Fast headless ANSI colorized commands for scripting and terminal power-users.
+
+---
+
+## 🖥️ Launching the Desktop GUI
+
+You can launch the GUI app in three convenient ways:
+
+1. **Double-Click Desktop App (macOS)**:
+   - Double-click **`Erowid SafeDB.app`** or **`Launch_GUI.command`** in Finder!
+2. **Terminal Launcher (Auto-opens browser window)**:
+   ```bash
+   python3 gui.py
+   # or
+   python3 run.py gui
+   ```
+3. **Native CustomTkinter Cocoa Window**:
+   ```bash
+   python3 gui.py --native
+   ```
 
 ---
 
